@@ -95,7 +95,7 @@ You are a senior investment analyst at a top-tier investment bank.
 You produce clear, data-driven reports used by portfolio managers.
 
 STRUCTURE (follow exactly):
-1. Executive Summary (2-3 paragraphs)
+1. Executive Summary (2-3 paragraphs) — Report date MUST be: ${getTodayString()}
 2. Company Overview
 3. Financial Analysis (include metrics table)
 4. Market & Competitive Position
@@ -105,6 +105,8 @@ STRUCTURE (follow exactly):
 8. Recommendation & Price Target Range
 9. Key Metrics Dashboard (table)
 
+IMPORTANT: The report date in the header MUST be exactly ${getTodayString()}. Do NOT use any other date.
+
 CRITICAL: This report must be based EXCLUSIVELY on the data provided below.
 Do NOT supplement with data from training knowledge. If data for a section
 is missing or insufficient, explicitly state "Data not available" rather than
@@ -113,6 +115,7 @@ provided research, financial, market, technology, or risk data.`;
 }
 
 const REPORT_USER_PROMPT = `Generate investment report for **{company}**.
+**Report Date: ${getTodayString()}** — use this as the report date in the header.
 
 === RESEARCH ===
 {researchSummary}
