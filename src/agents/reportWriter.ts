@@ -67,8 +67,9 @@ export class ReportWriterAgent {
     riskScore: number;
     reflexionContext?: string;
   }): Promise<string> {
-    return this.chain.invoke({
+    const report = await this.chain.invoke({
       company: params.company,
+      reportDate: getTodayString(),
       researchSummary: params.researchSummary,
       financialAnalysis: params.financialAnalysis,
       marketAnalysis: params.marketAnalysis,
@@ -77,10 +78,12 @@ export class ReportWriterAgent {
       riskScore: String(params.riskScore),
       reflexionContext: params.reflexionContext ?? "First attempt.",
     });
+    return fixReportDate(report);
   }
 
   async revise(draft: string, feedback: string, company: string): Promise<string> {
-    return this.revisionChain.invoke({ draft, feedback, company });
+    const report = await this.revisionChain.invoke({ draft, feedback, company });
+    return fixReportDate(report);
   }
 
   async translate(report: string): Promise<string> {
@@ -115,7 +118,10 @@ provided research, financial, market, technology, or risk data.`;
 }
 
 const REPORT_USER_PROMPT = `Generate investment report for **{company}**.
-**Report Date: ${getTodayString()}** — use this as the report date in the header.
+
+The report header MUST start with exactly:
+# Investment Analysis Report: {company}
+**Report Date:** {reportDate}
 
 === RESEARCH ===
 {researchSummary}
@@ -146,3 +152,13 @@ Rules:
 3. Use standard Chinese financial terminology (e.g., "市盈率" for P/E ratio, "市值" for market cap).
 4. Translate proper nouns using their widely-accepted Chinese names (e.g., NVIDIA = 英伟达, Apple = 苹果).
 5. Keep the same section structure and numbering.`;
+
+/** Post-process: force the Report Date line to use the actual current date. */
+function fixReportDate(report: string): string {
+  const today = getTodayString();
+  // Match "**Report Date:**" or "**Report Date**:" followed by any date string on the same line
+  return report.replace(
+    /(\*\*Report Date[:\s]*\*\*[:\s]*).+/i,
+    `$1${today}`
+  );
+}
