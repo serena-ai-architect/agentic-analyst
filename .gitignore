@@ -8,3 +8,4 @@ interview-talking-points.md
 .next/
 .turbo/
 *.tsbuildinfo
+.vercel
