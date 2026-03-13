@@ -271,7 +271,7 @@ export async function reportNode(state: AgentState): Promise<Partial<AgentState>
 }
 
 /** Replace the Key Metrics Dashboard (or append) with verified live data. */
-function appendLiveDataSection(report: string, liveDataJson: string): string {
+export function appendLiveDataSection(report: string, liveDataJson: string): string {
   if (report.includes("Live Market Data (Verified)")) return report;
 
   try {
@@ -503,7 +503,7 @@ const TICKER_MAP: Record<string, string> = {
   "百度": "9888.HK", "贵州茅台": "600519.SS", "宁德时代": "300750.SZ",
 };
 
-function guessTickerFromCompany(company: string): string | null {
+export function guessTickerFromCompany(company: string): string | null {
   const lower = company.toLowerCase().trim();
   if (TICKER_MAP[lower]) return TICKER_MAP[lower];
   for (const [key, ticker] of Object.entries(TICKER_MAP)) {

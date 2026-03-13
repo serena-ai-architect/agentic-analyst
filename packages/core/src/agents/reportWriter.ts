@@ -154,7 +154,7 @@ Rules:
 5. Keep the same section structure and numbering.`;
 
 /** Post-process: force the Report Date line to use the actual current date. */
-function fixReportDate(report: string): string {
+export function fixReportDate(report: string): string {
   const today = getTodayString();
   // Match "**Report Date:**" or "**Report Date**:" followed by any date string on the same line
   return report.replace(

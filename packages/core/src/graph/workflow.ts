@@ -41,7 +41,7 @@ import {
  * - Blocked + max retries → degrade to report (partial data)
  * - OK → proceed to analysis
  */
-function routeAfterResearch(state: AgentState): "analysis" | "research" | "report" {
+export function routeAfterResearch(state: AgentState): "analysis" | "research" | "report" {
   if (state.currentPhase === "research_blocked") {
     const retries = state.researchRetries ?? 0;
     if (retries < 2) return "research"; // retry
@@ -54,14 +54,14 @@ function routeAfterResearch(state: AgentState): "analysis" | "research" | "repor
  * Route after analysis based on mode.
  * Quick mode skips risk assessment.
  */
-function shouldSkipRisk(state: AgentState): "risk" | "report" {
+export function shouldSkipRisk(state: AgentState): "risk" | "report" {
   return state.mode === "quick" ? "report" : "risk";
 }
 
 /**
  * Route after reflexion based on quality score and iteration count.
  */
-function routeAfterReflexion(state: AgentState): "report" | "delivery" {
+export function routeAfterReflexion(state: AgentState): "report" | "delivery" {
   const score = state.qualityScore ?? 0;
   const iterations = state.iterationCount ?? 0;
 

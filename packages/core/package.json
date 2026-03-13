@@ -9,7 +9,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.1.0",
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/nodemailer": "^7.0.11",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.0"
   }
 }

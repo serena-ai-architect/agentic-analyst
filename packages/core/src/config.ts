@@ -37,7 +37,7 @@ export const LLMConfig = {
 /**
  * Detect LLM provider from model name.
  */
-function detectProvider(model: string): "deepseek" | "openai" | "anthropic" {
+export function detectProvider(model: string): "deepseek" | "openai" | "anthropic" {
   if (model.startsWith("claude-")) return "anthropic";
   if (model.startsWith("gpt-") || model.startsWith("o1") || model.startsWith("o3")) return "openai";
   return "deepseek";
