@@ -100,7 +100,7 @@ export class ReflexionEngine {
     pastReflections: string;
   }> {
     // Step 1: Evaluate with structured output (no regex needed)
-    const evaluatorLLM = this.llm.withStructuredOutput(EvaluationSchema);
+    const evaluatorLLM = (this.llm as any).withStructuredOutput(EvaluationSchema);
 
     let evaluation: z.infer<typeof EvaluationSchema>;
     try {
@@ -125,7 +125,7 @@ export class ReflexionEngine {
     const score = Math.min(10, Math.max(1, evaluation.overall));
 
     // Step 2: Reflect with structured output
-    const reflectorLLM = this.llm.withStructuredOutput(ReflectionSchema);
+    const reflectorLLM = (this.llm as any).withStructuredOutput(ReflectionSchema);
 
     let reflection: z.infer<typeof ReflectionSchema>;
     try {

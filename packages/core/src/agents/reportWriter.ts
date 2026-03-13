@@ -45,7 +45,7 @@ export class ReportWriterAgent {
   }
 
   private buildTranslationChain() {
-    const llm = createLLM({ model: LLMConfig.reportModel, temperature: 0.3 });
+    const llm = createLLM({ model: LLMConfig.translationModel, temperature: 0.3 });
     const prompt = ChatPromptTemplate.fromMessages([
       ["system", TRANSLATION_SYSTEM_PROMPT],
       ["human",

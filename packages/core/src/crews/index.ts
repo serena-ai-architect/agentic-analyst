@@ -241,7 +241,7 @@ export class RiskCrew {
    */
   private async extractStructuredRiskScore(company: string, riskAssessment: string): Promise<number> {
     try {
-      const llm = createLLM({ model: LLMConfig.analysisModel, temperature: 0 });
+      const llm = createLLM({ model: LLMConfig.analysisModel, temperature: 0 }) as any;
       const structuredLLM = llm.withStructuredOutput(RiskScoreSchema);
 
       const result = await structuredLLM.invoke([

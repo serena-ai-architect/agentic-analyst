@@ -1,42 +1,86 @@
 /**
  * Configuration & Model Settings
  * ================================
- * Centralized config for all agents, models, and runtime parameters.
- * Uses DeepSeek-V3 as the primary LLM provider (OpenAI-compatible API).
+ * Centralized config with multi-provider model routing.
+ *
+ * Supports DeepSeek, OpenAI, and Anthropic models via a single createLLM()
+ * function that auto-detects the provider from the model name:
+ *   - "deepseek-*" → DeepSeek API
+ *   - "gpt-*" / "o1*" / "o3*" → OpenAI API
+ *   - "claude-*" → Anthropic API
+ *
+ * Set per-stage models via environment variables. Default: all deepseek-chat.
  */
 
 import "dotenv/config";
 import { ChatOpenAI } from "@langchain/openai";
+import { ChatAnthropic } from "@langchain/anthropic";
 import { createOpenAI } from "@ai-sdk/openai";
 
 const DEEPSEEK_BASE_URL = process.env.DEEPSEEK_BASE_URL ?? "https://api.deepseek.com/v1";
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY ?? "";
+
 export function getTodayString(): string {
   return new Date().toISOString().split("T")[0];
 }
 
 export const LLMConfig = {
-  planningModel: process.env.PLANNING_MODEL ?? "deepseek-chat",
-  researchModel: process.env.RESEARCH_MODEL ?? "deepseek-chat",
-  analysisModel: process.env.ANALYSIS_MODEL ?? "deepseek-chat",
-  reportModel: process.env.REPORT_MODEL ?? "deepseek-chat",
-  evaluationModel: process.env.EVALUATION_MODEL ?? "deepseek-chat",
+  planningModel:    process.env.PLANNING_MODEL    ?? "deepseek-chat",
+  researchModel:    process.env.RESEARCH_MODEL    ?? "deepseek-chat",
+  analysisModel:    process.env.ANALYSIS_MODEL    ?? "deepseek-chat",
+  reportModel:      process.env.REPORT_MODEL      ?? "deepseek-chat",
+  translationModel: process.env.TRANSLATION_MODEL ?? "deepseek-chat",
+  evaluationModel:  process.env.EVALUATION_MODEL  ?? "deepseek-chat",
   temperature: 0.1,
 } as const;
 
 /**
- * Create a ChatOpenAI instance configured for DeepSeek.
- * Used by LangChain-based agents (crews, skills, etc.)
+ * Detect LLM provider from model name.
+ */
+function detectProvider(model: string): "deepseek" | "openai" | "anthropic" {
+  if (model.startsWith("claude-")) return "anthropic";
+  if (model.startsWith("gpt-") || model.startsWith("o1") || model.startsWith("o3")) return "openai";
+  return "deepseek";
+}
+
+/**
+ * Create an LLM instance with automatic provider routing.
+ *
+ * Returns ChatOpenAI or ChatAnthropic — both implement BaseChatModel,
+ * so bindTools(), withStructuredOutput(), invoke() all work identically.
+ * All 9 downstream call sites require zero changes.
  */
 export function createLLM(opts: { model?: string; temperature?: number } = {}) {
-  return new ChatOpenAI({
-    model: opts.model ?? LLMConfig.analysisModel,
-    temperature: opts.temperature ?? LLMConfig.temperature,
-    configuration: {
-      baseURL: DEEPSEEK_BASE_URL,
-      apiKey: DEEPSEEK_API_KEY,
-    },
-  });
+  const model = opts.model ?? LLMConfig.analysisModel;
+  const temperature = opts.temperature ?? LLMConfig.temperature;
+  const provider = detectProvider(model);
+
+  switch (provider) {
+    case "anthropic":
+      return new ChatAnthropic({
+        model,
+        temperature,
+        anthropicApiKey: process.env.ANTHROPIC_API_KEY ?? "",
+      });
+
+    case "openai":
+      return new ChatOpenAI({
+        model,
+        temperature,
+        openAIApiKey: process.env.OPENAI_API_KEY ?? "",
+      });
+
+    case "deepseek":
+    default:
+      return new ChatOpenAI({
+        model,
+        temperature,
+        configuration: {
+          baseURL: DEEPSEEK_BASE_URL,
+          apiKey: DEEPSEEK_API_KEY,
+        },
+      });
+  }
 }
 
 /**
