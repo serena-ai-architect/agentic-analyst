@@ -182,7 +182,5 @@ ai-investment-analyst/
 │   │       └── middleware.ts       # Auth guard
 │   └── cli/                        # CLI tool (@repo/cli)
 │       └── src/main.ts             # CLI entry point
-├── docs/
-│   └── saas-architecture.md        # SaaS architecture plan (EN + ZH)
 └── output/                         # Generated reports (*.md)
 ```

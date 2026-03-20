@@ -9,6 +9,11 @@ interview-talking-points.md
 .turbo/
 *.tsbuildinfo
 .vercel
+EVALUATION.md
+docs/
+ai-investment-system-testing-framework.md
+harness-engineering-action-plan.md
+harness-engineering-action-plan-cn.md
 
 # Eval results (except baseline and .gitkeep)
 packages/core/src/eval/results/*.json
